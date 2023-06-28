@@ -1,0 +1,87 @@
+<div class="row" *ngIf="member">
+  <div class="col-4">
+    <h1>Your profiles </h1>
+  </div>
+  <div class="col-8">
+    <div class="alert alert-info" *ngIf="editForm.dirty">
+      <strong>Information: </strong> You have made changes. Any unsaved changes will be lost
+    </div>
+    <!-- ngif nó áp dụng cho phân tử div .nếu biến editForm.dirty true hay false . nếu biến là tru thì hiện thi cái you have change
+    tức là đã thay đổi -->
+  </div>
+
+  <div class="col-4">
+    <div class="card">
+      <img src="{{member.photoUrl || './assets/user.png' }}" alt="" class="card-img-top img-thumbnail">
+      <div class="card-body">
+        <div class="">
+          <strong>Location: </strong>
+          <p>{{member.city}},{{member.country}} </p>
+        </div>
+        <div class="">
+          <strong>Age: </strong>
+          <p>{{member.age}}</p>
+        </div>
+        <div class="">
+          <strong>Last Active</strong>
+          <p>{{member.lastActive}}</p>
+        </div>
+        <div class="">
+          <strong>Member since </strong>
+          <p>{{member.created | date:"longDate"}}</p>
+        </div>
+      </div>
+      <div class="card-footer">
+          <button [disabled]="!editForm.dirty" form="editForm" type="submit"  class="button btn btn-success btn-block" >Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-8">
+    <tabset class="member-tabset">
+      <tab heading="About {{member.knownAs}}">
+        <form  #editForm="ngForm" id="editForm" (ngSubmit)="updateMember()">
+          <h4>Description</h4>
+          <textarea  class="form-control" [(ngModel)]="member.introduction" name="introduction"  rows="6"></textarea>
+          <h4 class="mt-2">Looking for</h4>
+          <textarea  class="form-control" [(ngModel)]="member.lookingFor" name="lookingFor"  rows="6"></textarea>
+          <h4 class="mt-2">Interests</h4>
+          <textarea  class="form-control" [(ngModel)]="member.interests" name="interests"  rows="6"></textarea>
+          <h4 class="mt-2">Location Detail:</h4>
+          <div class="form-inline d-flex ">
+            <label for="city">City:</label>
+            <input [(ngModel)]="member.city" type="text" name="city" class="form-control mx-2" >
+            <label for="city">Country:</label>
+            <input [(ngModel)]="member.country" type="text" name="country" class="form-control mx-2" >
+          </div>
+        </form>
+
+      </tab>
+      <tab heading="Edit Photos">
+        <!-- <p>Photo Edit will here</p> -->
+        <!-- truyển component photoedit vào -->
+        <app-photo-editor [member]="member"></app-photo-editor>
+          <!-- liên kết thuocj tính chuyển dữ liệu thành phần cha sang thành phần con
+          trong th này thành phần cha đc gọi là member
+        bất cứ thuộc tính đầu vào trong app-photo-edut thành phần đc cập nhật tự động -->
+      </tab>
+
+     </tabset>
+  </div>
+</div>
+
+<!-- GIẢI THÍCH NHỮNG ĐIỀU CẦN LƯU Ý -->
+<!-- đoạn mã ngif kiếm tra member đã đc tải lên thành công chưa
+  <form  #editForm="ngForm"> định nghĩa 1 form trong angular
+    edit form là 1
+khi nhấn vào nut save change ở button save change bắt sự kiện submit
+
+ <button [disabled]="editForm.dirty" form="editForm" type="submit"  class="button btn btn-success btn-block" >Save Changes</button>
+           thuộc tính disabled đc sử dụng để thay đổi trạng thái, nếu giá trị là true thì thuộc tính disabled sẽ đc apsdungj
+            disabled đc sủ dụng để ngăn chặn ng dùng click vào button để submit form nếu k có sự thay đổi nào trong form
+            thuộc tính dirty sẽ đc cập nhaath từ false sang tru .khi giá trị của thuộc tính dirty là true có nghĩa form đc thay đổi
+
+// nó cần tìm tên rõ ràng
+
+
+-->
