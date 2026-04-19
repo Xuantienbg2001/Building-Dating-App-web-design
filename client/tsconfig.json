@@ -1,39 +1,35 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "./", // Thêm dòng này để xác định gốc dự án
+    "paths": {
+      "src/*": ["src/*"] // Thêm dòng này để hiểu alias src/
+    },
     "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
+    // ... các phần còn lại giữ nguyên
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
-    // "noPropertyAccessFromIndexSignature": true,
     "types": [],
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
-    // "noImplicitAny": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
     "strictPropertyInitialization": false,
-
-
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "ignoreDeprecations": "6.0",
+    "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true,
-    "enableIvy": true
+    "strictTemplates": true
   }
 }

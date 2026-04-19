@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
-import { environment } from 'src/environments/enviroment';
+import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';

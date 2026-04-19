@@ -1,5 +1,5 @@
 import { ConfirmService } from './../_services/confirm.service';
-import { environment } from 'src/environments/enviroment';
+import { environment } from 'src/environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { getPaginationHeaders } from '../_services/paginationHelper';
 import { Message } from '../_models/message';

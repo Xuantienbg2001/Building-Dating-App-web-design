@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging; // Để sửa lỗi ILogger
 using System; // Để sửa lỗi Exception
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. CẤU HÌNH SERVICES (Thay thế ConfigureServices) ---
@@ -37,10 +38,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 // Cấu hình CORS (Lưu ý: Đặt giữa UseRouting và UseAuthorization nếu có)
+// Sửa phần này
 app.UseCors(x => x.AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("https://localhost:4200"));
+    .WithOrigins("https://localhost:4200", "http://localhost:4200")); // Thêm bản http vào đây
 
 app.UseAuthentication();
 app.UseAuthorization();

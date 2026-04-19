@@ -8,9 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.Extensions
 {
@@ -20,28 +17,25 @@ namespace API.Extensions
         {
             services.AddSingleton<PresenceTracker>();
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-            // cấu hình các thông tin cần thiết cho dịch vụ luuw trữ đám mây
+            
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepository, UserRepository>();
-
             services.AddScoped<IPhotoService, PhotoService>();
-            services.AddScoped<LogUserActivity>();  // đăng ký dịch vụ
+            services.AddScoped<LogUserActivity>();  
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
-            // cấu hình đăng ký để thực hiện ánh xạ các đối tượng trong ứng dụng
+            // SỬA DÒNG NÀY: Cấu hình tường minh để tránh lỗi System.Char trên .NET 8
+            services.AddAutoMapper(cfg => 
+            {
+                cfg.AddProfile<AutoMapperProfiles>();
+            }, typeof(AutoMapperProfiles).Assembly);
+
             services.AddDbContext<DataContext>(options =>
             {
-                // để tương tác với cơ sở dữ liệu
                 options.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
+
             return services;
         }
     }
 }
-
-//được sử dụng để đăng ký dịch vụ cần thiết cho ứng dụng 
-
-// nó dùng để cấu hình các dịch vụ đăng ký 
-
-// quan trọng nè : sau khi mà đăng ký các dịch vụ cta có thê sử dụng các class hoặc controllers khác của ứng dụng thông qua hệ thông dependency ịnection
