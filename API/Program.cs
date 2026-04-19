@@ -1,53 +1,76 @@
 using API.Data;
 using API.Entities;
-using Microsoft.AspNetCore.Hosting;
+using API.Extensions;
+using API.Middleware;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Builder; // Để sửa lỗi WebApplication
+using Microsoft.Extensions.DependencyInjection; 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging; // Để sửa lỗi ILogger
+using System; // Để sửa lỗi Exception
 
-namespace API
+var builder = WebApplication.CreateBuilder(args);
+
+// --- 1. CẤU HÌNH SERVICES (Thay thế ConfigureServices) ---
+
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddControllers();
+
+builder.Services.AddSwaggerGen(c =>
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            using var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+});
 
-            try{
+builder.Services.AddCors();
+builder.Services.AddIdentityService(builder.Configuration);
+builder.Services.AddSignalR();
 
-                var context = services.GetRequiredService<DataContext>();
-                var userManager = services.GetRequiredService<UserManager<AppUser>>();
-                //để lấy đối tượng usermanage<appuser>> sẽ trả về 1 đối tượng có kiểu t 
-                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-                await context.Database.MigrateAsync();
-                await Seed.SeedUser(userManager, roleManager);
-            }
-            catch(Exception ex){
+var app = builder.Build();
 
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred during migrating the database.");
+// --- 2. CẤU HÌNH HTTP PIPELINE (Thay thế Configure) ---
 
-            }
+app.UseMiddleware<ExceptionMiddleware>();
 
-            await host.RunAsync();
+app.UseHttpsRedirection();
 
+// Cấu hình CORS (Lưu ý: Đặt giữa UseRouting và UseAuthorization nếu có)
+app.UseCors(x => x.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .WithOrigins("https://localhost:4200"));
 
-        }
+app.UseAuthentication();
+app.UseAuthorization();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Mapping Endpoints (Thay thế cho UseEndpoints)
+app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
+
+// --- 3. SEED DATA (Thay thế logic trong Main cũ) ---
+
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+
+try
+{
+    var context = services.GetRequiredService<DataContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+    
+    await context.Database.MigrateAsync();
+    await Seed.SeedUser(userManager, roleManager);
 }
+catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during migrating the database.");
+}
+
+app.Run();
