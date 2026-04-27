@@ -61,3 +61,12 @@ Relationship flow:
 1. `chore(init): scaffold TaskBoard solution structure`
 2. `docs(api): define TaskBoard entity draft and endpoint plan`
 3. `feat(domain): add EF Core entities for TaskBoard core model`
+
+## Current Bootstrap Status
+
+- JWT register/login endpoints are available at `/api/auth/register` and `/api/auth/login`.
+- SignalR hub endpoint is mapped at `/hubs/board`.
+- EF Core initial migration is generated in `TaskBoard.Infrastructure/Data/Migrations`.
+- Application auto-applies migrations at startup and seeds default admin account:
+  - Username: `admin`
+  - Password: `Admin@123`

@@ -11,7 +11,7 @@ namespace API.Entities
         //với đối tượng appuserrole ta có thể xác định rằng 1 ng dùng có quyền truy cập 1 vai trog cụ thể nào đó 
         // ta có thể xác định rằng 1 ng dùng có quyền truy cập 1 vai trò cụ thể nào đó trong hệ thống phân quyền , nó đc sử dụng như 1 đối tượng nhiều nhiều
         //ví dụ cụ thể như là ng dùng a có quyền truy cập vào vai trò b , thông qua việc liên kết các đối tượng appuser và approle
-
+        
         public AppRole Role { get; set; }
         //role biểu diễn các vai trò của đối tượng username
 
