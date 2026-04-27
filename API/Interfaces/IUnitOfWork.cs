@@ -16,5 +16,7 @@ namespace API.Interfaces
         Task<bool> Complete();
 
         bool HasChange();
+
+        IBoardRepository BoardRepository { get; }
     }
 }

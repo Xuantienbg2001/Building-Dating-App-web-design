@@ -25,9 +25,12 @@ namespace API.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<Connection> Connections { get; set; }
 
+        public DbSet<Board> Boards { get; set; }
+        public DbSet<TaskItem> Tasks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder); // BẮT BUỘC PHẢI CÓ DÒNG NÀY ĐỂ IDENTITY HOẠT ĐỘNG
+            base.OnModelCreating(builder);
 
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
@@ -44,11 +47,12 @@ namespace API.Data
             builder.Entity<UserLike>()
                 .HasKey(k => new { k.SourceUserId, k.LikedUserId });
 
+            // SỬA TẠI ĐÂY: Chuyển sang NoAction để tránh lỗi Cycle path trên SQL Server
             builder.Entity<UserLike>()
                 .HasOne(s => s.SourceUser)
                 .WithMany(l => l.LikedUsers)
                 .HasForeignKey(s => s.SourceUserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction); 
 
             builder.Entity<UserLike>()
                 .HasOne(s => s.LikedUser)
@@ -66,7 +70,12 @@ namespace API.Data
                 .WithMany(m => m.MessagesSent)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // SỬA LỖI DÒNG 57: Chỉ chạy Converter nếu KHÔNG PHẢI là database ảo (InMemory)
+            builder.Entity<Board>()
+               .HasMany(b => b.Tasks)
+               .WithOne(t => t.Board)
+               .HasForeignKey(t => t.BoardId)
+               .OnDelete(DeleteBehavior.Cascade);
+
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
             {
                 builder.ApplyUtcDateTimeConverter();
@@ -74,6 +83,7 @@ namespace API.Data
         }
     }
 
+    // Các class bổ trợ giữ nguyên bên dưới...
     public static class UtcDateAnnotation
     {
         private const String IsUtcAnnotation = "IsUtc";

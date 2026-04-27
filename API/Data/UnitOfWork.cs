@@ -33,5 +33,7 @@ namespace API.Data
         {
             return _context.ChangeTracker.HasChanges();
         }
+
+        public IBoardRepository BoardRepository => new BoardRepository(_context, _mapper);
     }
 }

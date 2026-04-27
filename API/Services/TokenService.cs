@@ -20,7 +20,7 @@ namespace API.Services
         public TokenService(IConfiguration config, UserManager<AppUser> userManager)
         {
             _userManager = userManager;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Tokenkey"]));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
         }
 
         // tạo tài khoản token 
@@ -35,21 +35,21 @@ namespace API.Services
             };
             // sau đó cta sẽ lấy vai trog của ng dùng , để quản lý ng dùng và phân quyền
             var roles = await _userManager.GetRolesAsync(user);
-            
 
-            claims.AddRange(roles.Select(role =>new Claim(ClaimTypes.Role,role)));
+
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             // sau khi lấy đc danh sách , tiếp theo tạo ra dánh ách các claim (tức là thông tin và quyền hạn ) bằng cách thêm các claims về vai trò vào trong danh sách claims
-            
+
 
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
-           var tokenDescriptor = new SecurityTokenDescriptor
-          {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(7), // Tăng lên 7 ngày hoặc hơn khi đang dev
-            SigningCredentials = creds
-        };
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(7), // Tăng lên 7 ngày hoặc hơn khi đang dev
+                SigningCredentials = creds
+            };
 
             var tokenHandler = new JwtSecurityTokenHandler();
 

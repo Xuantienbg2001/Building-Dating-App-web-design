@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
+
 namespace API.Extensions
 {
     public static class ApplicationServiceExtenstions
@@ -30,10 +31,11 @@ namespace API.Extensions
                 cfg.AddProfile<AutoMapperProfiles>();
             }, typeof(AutoMapperProfiles).Assembly);
 
-            services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlite(config.GetConnectionString("DefaultConnection"));
-            });
+            // Thay vì .UseSqlite, hãy đổi thành .UseSqlServer
+           services.AddDbContext<DataContext>(options =>
+           {
+               options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
+           });
 
             return services;
         }

@@ -19,6 +19,8 @@ namespace API.Helpers
             CreateMap<Photo, PhotoDto>(); // cho phép dữ liệu ảnh đc chuyển đổi từ lớp photo sang lớp photodto
             CreateMap<MemberUpdateDto, AppUser>();
             CreateMap<RegisterDTO, AppUser>();
+            CreateMap<Board, BoardDto>();
+            CreateMap<BoardCreateDto, Board>();
             CreateMap<Message, MessageDto>()  //cho phép sao chép dữ liệu từ đối tượng mesage sang messagedto 
                .ForMember(dest => dest.SenderPhotoUrl, opt => opt.MapFrom(src => 
                src.Sender.Photos.FirstOrDefault(x=> x.IsMain).Url))
