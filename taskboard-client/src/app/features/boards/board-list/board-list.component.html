@@ -1,0 +1,39 @@
+<section class="board-list-page">
+  <header class="page-header">
+    <div>
+      <h1>Your boards</h1>
+      <p class="subtitle">Week 7 — board list with &#64;if / &#64;for</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="toggleCreate()">New board</button>
+  </header>
+
+  @if (showForm()) {
+    <form class="create-form" [formGroup]="createForm" (ngSubmit)="createBoard()">
+      <input formControlName="name" placeholder="Board name" />
+      <input formControlName="description" placeholder="Description (optional)" />
+      <button type="submit" [disabled]="createForm.invalid">Create</button>
+    </form>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="loading">Loading boards...</p>
+  } @else if (boards().length === 0) {
+    <p class="empty">No boards yet. Create your first board.</p>
+  } @else {
+    <div class="board-grid">
+      @for (board of boards(); track board.id) {
+        <a class="board-card" [routerLink]="['/boards', board.id]">
+          <h2>{{ board.name }}</h2>
+          @if (board.description) {
+            <p>{{ board.description }}</p>
+          }
+          <span class="meta">{{ board.memberCount }} members</span>
+        </a>
+      }
+    </div>
+  }
+</section>

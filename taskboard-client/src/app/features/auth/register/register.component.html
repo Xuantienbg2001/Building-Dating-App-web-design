@@ -1,0 +1,22 @@
+<section class="auth-card">
+  <h1>Register</h1>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+      Username
+      <input formControlName="userName" type="text" />
+    </label>
+    <label>
+      Email
+      <input formControlName="email" type="email" />
+    </label>
+    <label>
+      Password
+      <input formControlName="password" type="password" />
+    </label>
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+    <button type="submit" [disabled]="form.invalid">Create account</button>
+  </form>
+  <p>Already have an account? <a routerLink="/login">Login</a></p>
+</section>

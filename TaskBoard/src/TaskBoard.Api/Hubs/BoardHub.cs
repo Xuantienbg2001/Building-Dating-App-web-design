@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace TaskBoard.Api.Hubs;
 
+[Authorize]
 public sealed class BoardHub : Hub
 {
     public Task JoinBoard(string boardId)

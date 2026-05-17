@@ -65,6 +65,14 @@ public sealed class BoardsController(TaskBoardDbContext dbContext) : ControllerB
 
         dbContext.Boards.Add(board);
         dbContext.BoardMembers.Add(new BoardMember { BoardId = board.Id, UserId = userId.Value });
+
+        var defaultColumns = new[]
+        {
+            new BoardColumn { BoardId = board.Id, Name = "To Do", Order = 1 },
+            new BoardColumn { BoardId = board.Id, Name = "In Progress", Order = 2 },
+            new BoardColumn { BoardId = board.Id, Name = "Done", Order = 3 }
+        };
+        dbContext.Columns.AddRange(defaultColumns);
         await dbContext.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetBoardById), new { boardId = board.Id }, board);

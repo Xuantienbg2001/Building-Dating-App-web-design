@@ -1,0 +1,70 @@
+@if (loading()) {
+  <p class="status">Loading board...</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else {
+  @if (board(); as b) {
+  <section class="kanban-page">
+    <header class="kanban-header">
+      <div>
+        <a routerLink="/boards" class="back-link">← Boards</a>
+        <h1>{{ b.name }}</h1>
+        @if (b.description) {
+          <p class="description">{{ b.description }}</p>
+        }
+      </div>
+      <span class="live-badge">Live updates via SignalR</span>
+    </header>
+
+    @if (b.columns.length === 0) {
+      <p class="status">This board has no columns yet.</p>
+    } @else {
+      <div class="kanban-board">
+        @for (column of b.columns; track column.id) {
+          <article class="kanban-column">
+            <header class="column-header">
+              <h2>{{ column.name }}</h2>
+              <span class="count">{{ column.tasks.length }}</span>
+            </header>
+
+            <div class="task-list">
+              @for (task of column.tasks; track task.id) {
+                <div class="task-card">
+                  <h3>{{ task.title }}</h3>
+                  @if (task.description) {
+                    <p>{{ task.description }}</p>
+                  }
+                  <div class="task-actions">
+                    <select
+                      [ngModel]="task.columnId"
+                      (ngModelChange)="moveTask(task, $event)"
+                    >
+                      @for (opt of columnOptions(column.id); track opt.id) {
+                        <option [value]="opt.id">Move to {{ opt.name }}</option>
+                      }
+                    </select>
+                    <button type="button" class="btn-danger" (click)="deleteTask(task)">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              } @empty {
+                <p class="empty-column">No tasks</p>
+              }
+            </div>
+
+            <form class="add-task" (submit)="$event.preventDefault(); addTask(column)">
+              <input
+                [(ngModel)]="newTaskTitles[column.id]"
+                name="title-{{ column.id }}"
+                placeholder="New task title"
+              />
+              <button type="submit">Add</button>
+            </form>
+          </article>
+        }
+      </div>
+    }
+  </section>
+  }
+}

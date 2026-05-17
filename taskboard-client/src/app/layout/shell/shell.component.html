@@ -1,0 +1,13 @@
+<header class="app-bar">
+  <a routerLink="/boards" class="brand">TaskBoard</a>
+  <nav>
+    @if (auth.currentUser$ | async; as user) {
+      <span class="user">Hi, {{ user.userName }}</span>
+      <a routerLink="/boards" routerLinkActive="active">Boards</a>
+      <button type="button" (click)="logout()">Logout</button>
+    }
+  </nav>
+</header>
+<main>
+  <router-outlet />
+</main>

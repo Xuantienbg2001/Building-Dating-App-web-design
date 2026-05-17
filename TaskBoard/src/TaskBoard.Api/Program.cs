@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TaskBoard.Api.Hubs;
 using TaskBoard.Api.Security;
+using TaskBoard.Api.Services;
 using TaskBoard.Domain.Entities;
 using TaskBoard.Domain.Enums;
 using TaskBoard.Infrastructure.Data;
@@ -36,6 +37,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtOptions.Issuer,
             ValidAudience = jwtOptions.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 builder.Services.AddAuthorization();
@@ -68,6 +84,17 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSignalR();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBoardNotifier, BoardNotifier>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("TaskBoardClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddDbContext<TaskBoardDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("TaskBoardConnection")));
 
@@ -81,6 +108,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("TaskBoardClient");
 
 app.UseAuthentication();
 app.UseAuthorization();

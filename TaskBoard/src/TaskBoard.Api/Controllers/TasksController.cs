@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TaskBoard.Api.Services;
 using TaskBoard.Domain.Entities;
 using TaskBoard.Infrastructure.Data;
 
@@ -9,7 +10,7 @@ namespace TaskBoard.Api.Controllers;
 
 [ApiController]
 [Authorize]
-public sealed class TasksController(TaskBoardDbContext dbContext) : ControllerBase
+public sealed class TasksController(TaskBoardDbContext dbContext, IBoardNotifier boardNotifier) : ControllerBase
 {
     [HttpPost("api/columns/{columnId:guid}/tasks")]
     public async Task<IActionResult> CreateTask(Guid columnId, [FromBody] CreateTaskRequest request)
@@ -41,6 +42,7 @@ public sealed class TasksController(TaskBoardDbContext dbContext) : ControllerBa
 
         dbContext.Tasks.Add(task);
         await dbContext.SaveChangesAsync();
+        await boardNotifier.NotifyTaskChangedAsync(column.BoardId, task, "created");
         return Ok(task);
     }
 
@@ -87,6 +89,7 @@ public sealed class TasksController(TaskBoardDbContext dbContext) : ControllerBa
         if (request.Order is > 0) task.Order = request.Order.Value;
 
         await dbContext.SaveChangesAsync();
+        await boardNotifier.NotifyTaskChangedAsync(task.Column.BoardId, task, "updated");
         return Ok(task);
     }
 
@@ -109,6 +112,7 @@ public sealed class TasksController(TaskBoardDbContext dbContext) : ControllerBa
         task.ColumnId = targetColumnId;
         task.Order = order <= 0 ? 1 : order;
         await dbContext.SaveChangesAsync();
+        await boardNotifier.NotifyTaskChangedAsync(targetColumn.BoardId, task, "moved");
         return Ok(task);
     }
 
@@ -124,8 +128,11 @@ public sealed class TasksController(TaskBoardDbContext dbContext) : ControllerBa
         if (task is null) return NotFound();
         if (task.Column.Board.OwnerId != userId && task.CreatedById != userId) return Forbid();
 
+        var boardId = task.Column.BoardId;
+        var columnId = task.ColumnId;
         dbContext.Tasks.Remove(task);
         await dbContext.SaveChangesAsync();
+        await boardNotifier.NotifyTaskDeletedAsync(boardId, taskId, columnId);
         return NoContent();
     }
 
