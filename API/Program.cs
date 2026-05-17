@@ -89,6 +89,7 @@ app.UseStaticFiles();
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/message");
+app.MapHub<TaskHub>("hubs/task");
 
 // --- 3. SEED DATA (Thay thế logic trong Main cũ) ---
 
