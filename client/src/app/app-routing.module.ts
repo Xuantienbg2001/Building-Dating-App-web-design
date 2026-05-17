@@ -1,15 +1,18 @@
-import { AdminGuard } from './_guards/admin.guard';
+import { adminGuard } from './_guards/admin.guard';
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { MemberDetailedResolver} from './_rosolvers/member-detailed.resolvers';
-import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { preventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { TestErrorsComponent } from './errors/test-errors/test-errors.component';
-import { AuthGuard } from './_guards/auth.guard';
+import { authGuard } from './_guards/auth.guard';
+import { guestGuard } from './_guards/guest.guard';
 import { MemberListComponent } from './members/member-list/member-list.component';
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ListsComponent } from './lists/lists.component';
@@ -17,21 +20,19 @@ import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
+  {path: 'login', component: LoginComponent, canActivate: [guestGuard]},
+  {path: 'register', component: RegisterComponent, canActivate: [guestGuard]},
   {
     path:'',
     runGuardsAndResolvers: 'always',
-    canActivate:[AuthGuard],
+    canActivate:[authGuard],
     children:[
        {path: 'members', component: MemberListComponent},
        {path: 'members/:username', component: MemberDetailComponent, resolve: {member: MemberDetailedResolver}},
-       {path: 'member/edit', component: MemberEditComponent, canDeactivate: [PreventUnsavedChangesGuard]},
-       // khi mà người dùng thoat khỏi cpn này thì sẽ có 1 guard ngăn chặn hiện lên 1 dialog
-       // hỏi xem ngdung có muốn thay đổi và chưa lưu lại hay chưa
-
-
+       {path: 'member/edit', component: MemberEditComponent, canDeactivate: [preventUnsavedChangesGuard]},
        {path: 'lists', component: ListsComponent},
        {path: 'messages', component: MessagesComponent},
-       {path: 'admin', component: AdminPanelComponent, canActivate : [AdminGuard] },
+       {path: 'admin', component: AdminPanelComponent, canActivate : [adminGuard] },
 
     ]
   },

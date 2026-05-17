@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavComponent } from "./nav/nav.component";
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MemberListComponent } from './members/member-list/member-list.component';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
@@ -39,6 +40,7 @@ import { ConfirmDialogComponent } from './modals/confirm-dialog/confirm-dialog.c
     AppComponent,
     NavComponent,
     HomeComponent,
+    LoginComponent,
     RegisterComponent,
     MemberListComponent,
     MemberDetailComponent,

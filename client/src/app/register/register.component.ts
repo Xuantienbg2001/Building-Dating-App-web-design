@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService } from './../_services/account.service';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { FormControl } from '@angular/forms';
 
@@ -11,8 +11,6 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-    @Output() cancelRegister = new EventEmitter();
-   // model: any ={}; // any nó cho bất kì giá trị nào
     registerForm: FormGroup ;
     maxDate: Date;
 
@@ -81,7 +79,7 @@ export class RegisterComponent implements OnInit {
 
     // đc sử dụng để đăng ký tài khoản mới
     cancel() {
-       this.cancelRegister.emit(false);
+       this.router.navigateByUrl('/');
     }
 
 }

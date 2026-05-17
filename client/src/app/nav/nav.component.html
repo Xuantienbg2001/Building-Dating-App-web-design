@@ -84,21 +84,9 @@
             <a class="dropdown-item" (click)="logout()">Logout</a>
           </div>
         </div>
-        <form *ngIf="(accountService.currentUser$| async)===null" #loginForm="ngForm" class="d-flex" role="search" (ngSubmit)="login()"
-         autocomplete="off">
-          <input
-           name="username"
-           [(ngModel)]="model.username"
-           class="form-control me-2"
-           type="text"
-           placeholder="Username">
-          <input
-          name="password"
-           [(ngModel)]="model.password"
-           class="form-control me-2"
-           type="password"
-           placeholder="Password" >
-          <button class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
-        </form>
+        <ng-container *ngIf="(accountService.currentUser$ | async) === null">
+          <a class="btn btn-outline-light me-2" routerLink="/login">Login</a>
+          <a class="btn btn-success" routerLink="/register">Register</a>
+        </ng-container>
       </div>
   </nav>

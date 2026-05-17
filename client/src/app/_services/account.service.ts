@@ -23,8 +23,6 @@ export class AccountService {
 
   // contructor nhận tham chiếu đến 1 đối tượn http client
   login(model: any) {
-    console.log('lỗi ở đây');
-
     return this.http.post<User>(this.baseUrl + 'account/login', model).pipe(
       map((reponse: User) => {
          const user = reponse;
