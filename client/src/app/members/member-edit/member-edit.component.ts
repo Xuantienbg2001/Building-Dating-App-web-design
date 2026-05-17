@@ -39,7 +39,8 @@ export class MemberEditComponent implements OnInit {
 
 
   constructor(private accountServices: AccountService, private memberService: MembersService, private toastr: ToastrService) {
-    this.accountServices.currentUser$.pipe(take(1)).subscribe(user=>this.user= user)
+    const user = this.accountServices.getCurrentUser();
+    if (user) this.user = user;
 
     // lấy thông tin người dùng đang đăng nhập và lữu trữ nó bằng biến user
   }

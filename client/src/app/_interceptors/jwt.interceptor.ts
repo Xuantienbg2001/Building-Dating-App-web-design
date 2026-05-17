@@ -5,9 +5,8 @@ import {
   HttpEvent,
   HttpInterceptor
 } from '@angular/common/http';
-import { Observable, take } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AccountService } from '../_services/account.service';
-import { User } from '../_models/user';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -16,12 +15,8 @@ export class JwtInterceptor implements HttpInterceptor {
   // để nó khởi tạo 1 đối tượng
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    let currentUser!: User;
-    // khai báo biến currentUser kiểu user , đc khởi tạo lưu trữ thông tin hiện tại được lấy từ currentUser trong accountService
-    //thông tin user này sẽ đc thêm vào header
-
-    this.accountService.currentUser$.pipe(take(1)).subscribe(user => currentUser = user);
-    if(currentUser){
+    const currentUser = this.accountService.getCurrentUser();
+    if (currentUser) {
       request = request.clone({
         setHeaders: {
           Authorization: `Bearer ${currentUser.token}` // khi đã tạo ở đây rồi k cần httooption bên members

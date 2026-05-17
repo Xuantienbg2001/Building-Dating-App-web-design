@@ -84,7 +84,7 @@
             <a class="dropdown-item" (click)="logout()">Logout</a>
           </div>
         </div>
-        <ng-container *ngIf="(accountService.currentUser$ | async) === null">
+        <ng-container *ngIf="!(accountService.currentUser$ | async)">
           <a class="btn btn-outline-light me-2" routerLink="/login">Login</a>
           <a class="btn btn-success" routerLink="/register">Register</a>
         </ng-container>

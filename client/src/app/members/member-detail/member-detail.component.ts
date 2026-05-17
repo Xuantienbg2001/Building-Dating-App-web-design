@@ -38,7 +38,8 @@ export class MemberDetailComponent implements OnInit, OnDestroy{
    constructor(public precense : PresenceService , private route: ActivatedRoute,
     private messageService: MessageService, private accountService : AccountService,
     private router : Router) {
-        this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
+        const user = this.accountService.getCurrentUser();
+        if (user) this.user = user;
         this.router.routeReuseStrategy.shouldReuseRoute = () => false;
    }
 

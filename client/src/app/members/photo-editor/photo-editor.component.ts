@@ -26,7 +26,8 @@ export class PhotoEditorComponent implements OnInit {
 
   constructor(private accountService: AccountService, private memberService: MembersService) {
     // lấy thông tin người dùng hiện tại
-    this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user= user);
+    const user = this.accountService.getCurrentUser();
+    if (user) this.user = user;
     // lấy giá trị đầu tiên
   }
   ngOnInit(): void {

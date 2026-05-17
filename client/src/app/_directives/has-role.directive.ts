@@ -1,4 +1,3 @@
-import { take } from 'rxjs';
 import { AccountService } from 'src/app/_services/account.service';
 import { Directive, Input, TemplateRef, ViewContainerRef, OnInit } from '@angular/core';
 import { User } from '../_models/user';
@@ -10,18 +9,14 @@ import { User } from '../_models/user';
 export class HasRoleDirective implements OnInit {
   @Input() appHasRole : string[];
   // input tuwcslaf đc sử dụng là thuộc tính đầu vào, giá trị của nó có thể truyền từ cha sang thằng con
-  user : User;
-  constructor(private viewContainerRef: ViewContainerRef,
-     private templateRef: TemplateRef<any>,
-     private accountService: AccountService )
-  //đc sử dụng để quản lý view container và template của directive
- {
-       this.accountService.currentUser$.pipe(take(1)).subscribe(user =>{
-        this.user = user;
-       })
-       //sử dụng pth pipe để trả về luồng dữ liệu từ observable là ng dùng hiện tại
-       //take(1) lấy giá trị đầu tiên trả về observable
+  user: User | null = null;
 
+  constructor(
+    private viewContainerRef: ViewContainerRef,
+    private templateRef: TemplateRef<any>,
+    private accountService: AccountService
+  ) {
+    this.user = this.accountService.getCurrentUser();
   }
   ngOnInit(): void {
     //clear view if no roles

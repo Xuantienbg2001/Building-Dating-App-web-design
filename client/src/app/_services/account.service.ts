@@ -1,7 +1,7 @@
 import { PresenceService } from './presence.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import {map} from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import {User} from '../_models/user';
@@ -13,13 +13,28 @@ import {User} from '../_models/user';
 export class AccountService {
 
   baseUrl = environment.apiUrl; // đường dẫn đến api
-  private currentUserSource = new ReplaySubject<User>(1);  // 1 ở đây nói số phiên bản của ng dùng hiện tại có
+  private currentUserSource = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSource.asObservable();
-  // phương thức để cấu hình người dung hiện tại, currUsersource là đc khởi tạo bởi replay
-  // cho phép lắng nghe các phiên đăng nhập trc đó , `currentUser$` nó nhận lại các phiên đăng nhập
 
-  // contructor nhận tham chiếu đến 1 đối tượn http client
-  constructor(private http:HttpClient, private presence: PresenceService) { }
+  getCurrentUser(): User | null {
+    return this.currentUserSource.value;
+  }
+
+  constructor(private http: HttpClient, private presence: PresenceService) {
+    this.loadUserFromStorage();
+  }
+
+  private loadUserFromStorage(): void {
+    const userJson = localStorage.getItem('user');
+    if (!userJson) return;
+
+    try {
+      const user: User = JSON.parse(userJson);
+      this.setCurrentUser(user);
+    } catch {
+      localStorage.removeItem('user');
+    }
+  }
 
   // contructor nhận tham chiếu đến 1 đối tượn http client
   login(model: any) {
@@ -59,16 +74,11 @@ export class AccountService {
   // pth pipe đc sử lý trả về kết quả từ server
 
   setCurrentUser(user: User) {
-      // để sử dụng lưu trữ cục bộ
-      // tới nơi ng dùng hiện tại cấp cho ng dùng
-      user.roles = [];  // gán cho mảng rỗng của đối tượng user
+      user.roles = [];
       const roles = this.getDecodedToken(user.token).role;
-      console.log(roles);
-
-      // để giải mã token và trả về đối tượng json chứa thông tin giải mã
-      //thuộc tinh roles nó trả về 1 danh sách
-      //kiểm tra vai trò của chúng là 1 mảng hay là chuỗi
-      Array.isArray(roles) ? user.roles =roles : user.roles.push(roles);
+      if (roles) {
+        Array.isArray(roles) ? (user.roles = roles) : user.roles.push(roles);
+      }
       // nếu nó là mảng đối tượng user sẽ cập nhật với biến roles
       //nếu k phải là mảng thì nó đẩy mang user.roles
 
@@ -78,8 +88,8 @@ export class AccountService {
 
     logout() {
       localStorage.removeItem('user');
-      this.currentUserSource.next(null!);
-      this.presence.stopHubConnection()
+      this.currentUserSource.next(null);
+      this.presence.stopHubConnection();
     }
     getDecodedToken(token: string)
     {
