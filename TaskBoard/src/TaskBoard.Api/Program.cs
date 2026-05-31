@@ -11,7 +11,12 @@ using TaskBoard.Domain.Entities;
 using TaskBoard.Domain.Enums;
 using TaskBoard.Infrastructure.Data;
 
+using Microsoft.AspNetCore.HttpOverrides;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5242";
+builder.WebHost.UseUrls($"http://*:{port}");
 
 // Add services to the container.
 
@@ -89,7 +94,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("TaskBoardClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
+        policy.SetIsOriginAllowed(origin =>
+                origin.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) ||
+                origin.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase) ||
+                origin.EndsWith(".onrender.com", StringComparison.OrdinalIgnoreCase))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -100,14 +108,19 @@ builder.Services.AddDbContext<TaskBoardDbContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
-app.UseHttpsRedirection();
+// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("TaskBoardClient");
 
 app.UseAuthentication();

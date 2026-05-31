@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: taskboard-api
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerfilePath: ./TaskBoard/Dockerfile
+    dockerContext: ./TaskBoard
+    healthCheckPath: /api/health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Jwt__SigningKey
+        generateValue: true
+      - key: ConnectionStrings__TaskBoardConnection
+        value: Data Source=/app/taskboard.db
